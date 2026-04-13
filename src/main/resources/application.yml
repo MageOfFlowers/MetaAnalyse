@@ -1,27 +1,22 @@
 spring:
   datasource:
-    # 1. Sửa lại URL: Bỏ đoạn user/password dư thừa trong chuỗi URL
-    # Nếu dùng cổng 5432 (Direct), dùng host: db.rgilyeocaabbppzoqzln.supabase.co
-    # Nếu dùng cổng 6543 (Pooler), dùng host: aws-1-ap-southeast-1.pooler.supabase.com
-    url: jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?prepareThreshold=0
-    
-    # 2. Quan trọng: Khi dùng Pooler (cổng 6543), username PHẢI là "postgres.[mã-project]"
-    username: postgres.rgilyeocaabbppzoqzln
-    
-    # 3. Password sạch, không để trong ngoặc []
-    password: Okitasouji5
+    # Sử dụng biến môi trường để bảo mật thông tin (Render/Railway sẽ tự điền nếu bạn cấu hình)
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?prepareThreshold=0}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres.rgilyeocaabbppzoqzln}
+    password: ${SPRING_DATASOURCE_PASSWORD:Okitasouji5}
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        # Thêm cấu hình này để tránh lỗi khi dùng Pooler của Supabase
         temp:
           use_jdbc_metadata_defaults: false
 
 server:
-  port: 8080
+  # CỰC KỲ QUAN TRỌNG: Render/Railway cấp port ngẫu nhiên, không phải luôn là 8080
+  port: ${PORT:8080}
