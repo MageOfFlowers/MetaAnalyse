@@ -18,6 +18,27 @@ public class GameController {
     @Autowired private CompetitionRepository compRepo;
     @Autowired private CompetitionUseRepository compUseRepo;
     @Autowired private DeckInfoRepository deckInfoRepo;
+    
+    // ĐÃ THÊM: Khai báo 2 repository thiếu để sửa lỗi "cannot find symbol"
+    @Autowired private UserRepository userRepo;
+    @Autowired private DeckRepository deckRepo;
+
+    // --- LẤY DỮ LIỆU (GET) ---
+
+    @GetMapping("/cards")
+    public List<Card> getCards() { 
+        return cardRepo.findAll(); 
+    }
+
+    @GetMapping("/competitions")
+    public List<Competition> getCompetitions() { 
+        return compRepo.findAll(); 
+    }
+
+    @GetMapping("/competition-use")
+    public List<CompetitionUse> getAllCompetitionUses() {
+        return compUseRepo.findAll();
+    }
 
     @GetMapping("/deck-infos")
     public List<DeckInfo> getAllDeckInfos() {
@@ -34,24 +55,14 @@ public class GameController {
         return deckRepo.findAll();
     }
 
-    // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
-
-    @PostMapping("/decks")
-    public Deck createDeck(@RequestBody DeckRequestDTO dto) {
-        return gameService.createDeck(dto);
-    }
-
-    @GetMapping("/cards")
-    public List<Card> getCards() { return cardRepo.findAll(); }
-
-    @GetMapping("/competitions")
-    public List<Competition> getCompetitions() { return compRepo.findAll(); }
+    // --- TẠO DỮ LIỆU (POST) ---
 
     @PostMapping("/users")
     public User addUser(@RequestParam String username) {
         return gameService.createUser(username);
     }
 
+    // ĐÃ GỘP: Chỉ giữ lại MỘT hàm createDeck duy nhất
     @PostMapping("/decks")
     public Deck createDeck(@RequestBody DeckRequestDTO dto) {
         return gameService.createDeck(dto);
@@ -60,10 +71,5 @@ public class GameController {
     @PostMapping("/competition-use")
     public CompetitionUse register(@RequestBody CompetitionRegistrationDTO dto) {
         return gameService.registerToCompetition(dto);
-    }
-    
-    @GetMapping("/competition-use")
-    public List<CompetitionUse> getAllCompetitionUses() {
-        return compUseRepo.findAll();
     }
 }
