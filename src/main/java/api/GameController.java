@@ -35,11 +35,6 @@ public class GameController {
     }
 
     // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
-    
-    @PostMapping("/users")
-    public User addUser(@RequestParam String username) {
-        return gameService.createUser(username);
-    }
 
     @PostMapping("/decks")
     public Deck createDeck(@RequestBody DeckRequestDTO dto) {
