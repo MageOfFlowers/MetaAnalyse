@@ -24,6 +24,28 @@ public class GameController {
         return deckInfoRepo.findAll();
     }
 
+    @GetMapping("/users")
+    public List<User> getAllUsers() {
+        return userRepo.findAll();
+    }
+
+    @GetMapping("/decks")
+    public List<Deck> getAllDecks() {
+        return deckRepo.findAll();
+    }
+
+    // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
+    
+    @PostMapping("/users")
+    public User addUser(@RequestParam String username) {
+        return gameService.createUser(username);
+    }
+
+    @PostMapping("/decks")
+    public Deck createDeck(@RequestBody DeckRequestDTO dto) {
+        return gameService.createDeck(dto);
+    }
+
     @GetMapping("/cards")
     public List<Card> getCards() { return cardRepo.findAll(); }
 
