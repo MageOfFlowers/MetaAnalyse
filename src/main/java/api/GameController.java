@@ -50,7 +50,7 @@ public class GameController {
         return userRepo.findAll();
     }
 
-    @GetMapping("/decks")
+    @GetMapping("/decksget")
     public List<Deck> getAllDecks() {
         return deckRepo.findAll();
     }
