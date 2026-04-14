@@ -57,7 +57,7 @@ public class GameController {
 
     // --- TẠO DỮ LIỆU (POST) ---
 
-    @PostMapping("/users")
+    @PostMapping("/usersadd")
     public User addUser(@RequestParam String username) {
         return gameService.createUser(username);
     }
