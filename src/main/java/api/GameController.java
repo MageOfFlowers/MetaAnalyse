@@ -72,4 +72,19 @@ public class GameController {
     public CompetitionUse register(@RequestBody CompetitionRegistrationDTO dto) {
         return gameService.registerToCompetition(dto);
     }
+    
+    @PostMapping("/competition-use-delete")
+    public int deleteCompetitionUse(@RequestBody long Id) {
+        return gameService.deleteCompetitionUse(Id);
+    }
+    
+    @PostMapping("/deck-delete")
+    public int deleteDeck(@RequestBody long Id) {
+        return gameService.deleteDeck(Id);
+    }
+    
+    @PostMapping("/user-delete")
+    public int deleteUser(@RequestBody long Id) {
+        return gameService.deleteUser(Id);
+    }
 }

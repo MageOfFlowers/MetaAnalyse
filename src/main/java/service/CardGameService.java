@@ -70,4 +70,32 @@ public class CardGameService {
         use.setRank(dto.getRank());
         return compUseRepo.save(use);
     }
+    
+    public int deleteCompetitionUse(Long id) {
+        if (compUseRepo.existsById(id)) {
+            compUseRepo.deleteById(id);
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+    
+    public int deleteDeck(Long id) {
+        if (deckRepo.existsById(id)) {
+            deckRepo.deleteById(id);
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+    
+    
+    public int deleteUser(Long id) {
+        if (userRepo.existsById(id)) {
+            userRepo.deleteById(id);
+            return 0;
+        } else {
+            return 1;
+        }
+    }
 }
