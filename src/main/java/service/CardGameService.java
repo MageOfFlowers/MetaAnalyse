@@ -80,13 +80,42 @@ public class CardGameService {
         }
     }
     
-    public int deleteDeck(Long id) {
-        if (deckRepo.existsById(id)) {
-            deckRepo.deleteById(id);
-            return 0;
+    @Transactional
+    public Deck saveOrUpdateDeck(DeckRequestDTO dto) {
+        Deck deck;
+        
+        if (dto.getId() != 0) {
+            // 1. Trường hợp UPDATE:
+            // Tìm deck cũ. Trigger BEFORE UPDATE trên DB sẽ tự động chạy 
+            // câu lệnh DELETE FROM deck_info WHERE deckid = OLD.id
+            deck = deckRepo.findById(dto.getId()).orElse(new Deck());
         } else {
-            return 1;
+            // 2. Trường hợp CREATE:
+            deck = new Deck();
         }
+        
+        deck.setName(dto.getName());
+        
+        // Lưu Deck (Nếu là update, Trigger sẽ tự dọn dẹp deck_info cũ ngay lúc này)
+        Deck savedDeck = deckRepo.save(deck);
+
+        // 3. Chèn danh sách card mới (áp dụng cho cả Create và Update)
+        dto.getCards().forEach(c -> {
+            DeckInfo info = new DeckInfo();
+            info.setDeckid(savedDeck.getId());
+            info.setCardid(c.getCardid());
+            info.setQuantity(c.getQuantity());
+            deckInfoRepo.save(info);
+        });
+        
+        return savedDeck;
+    }
+
+    @Transactional
+    public void deleteDeckWithInfo(Long deckId) {
+        // Không cần gọi deckInfoRepo.deleteById nữa!
+        // Trigger BEFORE DELETE trên DB sẽ tự động dọn dẹp deck_info khi lệnh dưới đây chạy.
+        deckRepo.deleteById(deckId);
     }
     
     

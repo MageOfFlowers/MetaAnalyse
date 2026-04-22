@@ -79,8 +79,8 @@ public class GameController {
     }
     
     @PostMapping("/deck-delete")
-    public int deleteDeck(@RequestBody long Id) {
-        return gameService.deleteDeck(Id);
+    public void deleteDeck(@RequestBody Long id) {
+        gameService.deleteDeckWithInfo(id);
     }
     
     @PostMapping("/user-delete")
