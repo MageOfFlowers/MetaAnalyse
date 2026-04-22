@@ -65,7 +65,7 @@ public class GameController {
     // ĐÃ GỘP: Chỉ giữ lại MỘT hàm createDeck duy nhất
     @PostMapping("/decks")
     public Deck createDeck(@RequestBody DeckRequestDTO dto) {
-        return gameService.createDeck(dto);
+        return gameService.saveOrUpdateDeck(dto);
     }
 
     @PostMapping("/competition-use")
