@@ -19,7 +19,7 @@ spring:
 # Đưa gemini ra ngoài datasource để tránh nhầm lẫn cấu hình DB
 gemini:
   api:
-    key: AIzaSyANfOx_sen45t41QnGJa1c1iID1V7Wfsl0
+    key: ${GEMINI_API_KEY}
     url: https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent
 
 server:
