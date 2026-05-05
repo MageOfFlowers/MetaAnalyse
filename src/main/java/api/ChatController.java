@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import dto.ActionConfig;
 import dto.AiIntent;
 import dto.ChatResponse;
 import repository.AnalysisRepository;
+import service.ActionConfigService;
 import service.ChatService;
 
 @RestController
@@ -65,26 +67,18 @@ public class ChatController {
             return ResponseEntity.status(500).body("Lỗi hệ thống: " + e.getMessage());
         }
     }
+    @Autowired
+    private ActionConfigService actionConfigService;
 
     private String generateReply(String action, Map<String, Object> params, List<Map<String, Object>> data) {
         if (data == null || data.isEmpty()) {
             return "Tôi đã tra cứu nhưng không tìm thấy dữ liệu phù hợp trong hệ thống.";
         }
-        
-        switch (action) {
-            case "GET_TOP_CARDS":
-                return "Đây là danh sách các lá bài hàng đầu phù hợp với yêu cầu của bạn.";
-            case "GET_USAGE_STATS":
-                String mode = "rarity".equals(params.get("view_mode")) ? "độ hiếm" : "màu sắc";
-                return "Đây là biểu đồ phân bổ tỷ lệ Meta theo " + mode + " mà bạn cần.";
-            case "GET_DECK_RANKINGS":
-                return "Dưới đây là bảng xếp hạng các bộ bài (Decks) có hiệu suất tốt nhất.";
-            case "ANALYZE_CARD_DETAIL":
-                return "Phân tích xong! Lá bài '" + params.get("card_name") + "' có hiệu số winrate thay đổi theo số lượng bản copy như sau:";
-            case "GET_PLAYER_RANKINGS":
-                return "Đây là danh sách những người chơi xuất sắc nhất dựa trên dữ liệu giải đấu.";
-            default:
-                return "Kết quả tra cứu dữ liệu Meta của bạn đã sẵn sàng:";
+        ActionConfig config = actionConfigService.getConfig(action);
+        if ("ANALYZE_CARD_DETAIL".equals(action) && params.containsKey("card_name")) {
+            return String.format(config.getReply(), params.get("card_name"));
         }
+
+        return config.getReply();
     }
 }

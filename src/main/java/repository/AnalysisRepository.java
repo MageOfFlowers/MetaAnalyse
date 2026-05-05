@@ -9,14 +9,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import dto.ActionConfig;
+import service.ActionConfigService;
+
 @Repository
 public class AnalysisRepository {
-
+	@Autowired
+	private ActionConfigService actionConfigService;
     @Autowired
     private JdbcTemplate db;
 
     public List<Map<String, Object>> executeAction(String action, Map<String, Object> params) {
-        if (params == null) params = new HashMap<>();
+    	ActionConfig config = actionConfigService.getConfig(action);
+        
+        // Nếu là action tĩnh, trả về dữ liệu từ CSV luôn, không vào Database
+        if (config.isStatic()) {
+            List<Map<String, Object>> result = new ArrayList<>();
+            if (config.getStaticData() != null && !config.getStaticData().isEmpty()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("link", config.getStaticData()); // Trả về dạng JSON {"link": "..."}
+                result.add(map);
+            }
+            return result;
+        }
+    	if (params == null) params = new HashMap<>();
         
         // Xử lý bộ lọc chung (Lấy trực tiếp từ params vì AI trả về phẳng)
         StringBuilder commonFilter = new StringBuilder(" WHERE 1=1 ");
@@ -56,7 +72,8 @@ public class AnalysisRepository {
 
             case "GET_PLAYER_RANKINGS":
                 return getPlayerRankings(params, commonFilter.toString(), queryParams);
-
+            case "YOUTUBE_CHANNEL":
+            	return getYoutubeLink();
             default:
                 return new ArrayList<>();
         }
@@ -146,5 +163,16 @@ public class AnalysisRepository {
                      " LIMIT " + params.getOrDefault("limit", 10);
         
         return db.queryForList(sql, p.toArray());
+    }
+    
+ // 6. Link Youtube
+    private List<Map<String, Object>> getYoutubeLink() {
+        List<Map<String, Object>> result = new ArrayList<>();
+        Map<String, Object> linkMap = new HashMap<>();
+        
+        linkMap.put("link", "https://www.youtube.com/@bb449-m2y");
+        result.add(linkMap);
+        
+        return result;
     }
 }

@@ -27,6 +27,7 @@ public class ChatService {
             "Nhiệm vụ: Chuyển câu hỏi người dùng thành JSON. " +
             "Các Action: GET_TOP_CARDS, GET_USAGE_STATS, GET_DECK_RANKINGS, ANALYZE_CARD_DETAIL, GET_PLAYER_RANKINGS. " +
             "Tham số: limit (int), color (R, G, P, Y), region (N, S), card_name (string), sort_by (winrate/usage), view_mode (color/rarity). " +
+            "Đặc biệt: Nếu câu hỏi liên quan đến Youtube, gameplay tham khảo,... thì action là YOUTUBE_CHANNEL." +
             "LƯU Ý: CHỈ TRẢ VỀ JSON, KHÔNG GIẢI THÍCH.";
 
         // Cấu trúc Request Body theo chuẩn Google Gemini API
