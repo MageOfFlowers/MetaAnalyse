@@ -24,7 +24,7 @@ public class Guide {
 
     @Type(JsonBinaryType.class)
     @Column(name = "details", columnDefinition = "jsonb")
-    private Map<String, String> details;
+    private Map<String, Object> details;
     
     public Long getId() {
         return id;
@@ -38,7 +38,7 @@ public class Guide {
         return name;
     }
 
-    public Map<String, String> getDetails() {
+    public Map<String, Object> getDetails() {
         return details;
     }
 
@@ -56,7 +56,7 @@ public class Guide {
         this.name = name;
     }
 
-    public void setDetails(Map<String, String> details) {
+    public void setDetails(Map<String, Object> details) {
         this.details = details;
     }
 }
