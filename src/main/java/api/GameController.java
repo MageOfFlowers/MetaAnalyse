@@ -18,6 +18,7 @@ public class GameController {
     @Autowired private CompetitionRepository compRepo;
     @Autowired private CompetitionUseRepository compUseRepo;
     @Autowired private DeckInfoRepository deckInfoRepo;
+    @Autowired private GuideRepository guideRepo;
     
     // ĐÃ THÊM: Khai báo 2 repository thiếu để sửa lỗi "cannot find symbol"
     @Autowired private UserRepository userRepo;
@@ -53,6 +54,11 @@ public class GameController {
     @GetMapping("/decksget")
     public List<Deck> getAllDecks() {
         return deckRepo.findAll();
+    }
+    
+    @GetMapping("/guide")
+    public List<Guide> getAllGuides() {
+        return guideRepo.findAll();
     }
 
     // --- TẠO DỮ LIỆU (POST) ---

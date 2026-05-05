@@ -1,6 +1,6 @@
 spring:
   datasource:
-    # Sử dụng biến môi trường để bảo mật thông tin (Render/Railway sẽ tự điền nếu bạn cấu hình)
+    # Sử dụng biến môi trường để bảo mật thông tin
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?prepareThreshold=0}
     username: ${SPRING_DATASOURCE_USERNAME:postgres.rgilyeocaabbppzoqzln}
     password: ${SPRING_DATASOURCE_PASSWORD:Okitasouji5}
@@ -13,10 +13,14 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        # Thêm cấu hình này để tránh lỗi khi dùng Pooler của Supabase
         temp:
           use_jdbc_metadata_defaults: false
 
+# Đưa gemini ra ngoài datasource để tránh nhầm lẫn cấu hình DB
+gemini:
+  api:
+    key: AIzaSyANfOx_sen45t41QnGJa1c1iID1V7Wfsl0
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent
+
 server:
-  # CỰC KỲ QUAN TRỌNG: Render/Railway cấp port ngẫu nhiên, không phải luôn là 8080
   port: ${PORT:8080}
