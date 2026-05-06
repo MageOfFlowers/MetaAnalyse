@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AiIntent {
     public String action;
     
-    @JsonProperty("parameters") // Map trường parameters từ AI vào biến params
+    @JsonProperty("params") // Map trường parameters từ AI vào biến params
     public Map<String, Object> params;
 
     // Getter và Setter

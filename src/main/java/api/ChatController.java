@@ -2,6 +2,7 @@ package api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,50 +32,58 @@ public class ChatController {
     @Autowired 
     private AnalysisRepository repository;
 
-    @PostMapping("/ask")
-    public ResponseEntity<?> ask(@RequestBody Map<String, String> request) {
-        try {
-            String userMsg = request.get("message");
-            if (userMsg == null || userMsg.isEmpty()) {
-                return ResponseEntity.badRequest().body("Tin nhắn không được để trống");
-            }
-
-            // 1. Lấy chuỗi JSON thô từ Gemini
-            String rawJson = chatService.getRawAiResponse(userMsg);
-            
-            // 2. Parse JSON sang AiIntent
-            ObjectMapper mapper = new ObjectMapper();
-            AiIntent intent;
-            try {
-                intent = mapper.readValue(rawJson, AiIntent.class);
-            } catch (Exception e) {
-                return ResponseEntity.ok(new ChatResponse(
-                    "Xin lỗi, tôi không thể phân tích yêu cầu này. Hãy thử hỏi về 'top card', 'winrate' hoặc 'tỷ lệ meta' nhé.", 
-                    null
-                ));
-            }
-
-            // 3. Thực thi truy vấn SQL dựa trên action và các filters (region, date, color...)
-            List<Map<String, Object>> dbData = repository.executeAction(intent.action, intent.params);
-            
-            // 4. Tạo phản hồi tự nhiên dựa trên kết quả thực tế
-            String naturalReply = generateReply(intent.action, intent.params, dbData);
-            
-            return ResponseEntity.ok(new ChatResponse(naturalReply, dbData));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Lỗi hệ thống: " + e.getMessage());
-        }
-    }
     @Autowired
     private ActionConfigService actionConfigService;
+
+    @PostMapping(value = "/ask", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> ask(@RequestBody Map<String, String> request) {
+    	try {
+        String userMsg = request.get("message");
+        
+        // 1. Check Cache trước
+        ActionConfig staticMatch = actionConfigService.findStaticMatch(userMsg);
+        if (staticMatch != null) {
+            return ResponseEntity.ok(new ChatResponse(staticMatch.getReply(), null));
+        }
+
+        // 2. Gọi Gemini
+        String rawJson = chatService.getRawAiResponse(userMsg);
+        ObjectMapper mapper = new ObjectMapper();
+        AiIntent intent = mapper.readValue(rawJson, AiIntent.class);
+
+        // 3. Xử lý LEARN_KNOWLEDGE
+        if ("LEARN_KNOWLEDGE".equals(intent.action)) {
+            // Lấy dữ liệu từ params của intent
+            String answer = (String) intent.params.get("answer");
+            String topic = (String) intent.params.get("topic");
+            String keywords = (String) intent.params.get("keywords");
+
+            // LƯU VÀO CSV: Đảm bảo gọi hàm này
+            actionConfigService.learnNewAction(topic, answer, true, null, keywords);
+
+            // TRẢ VỀ CHO FRONTEND
+            return ResponseEntity.ok(new ChatResponse(answer, null));
+        }
+
+        // 4. Các action Dynamic khác (SQL)
+        List<Map<String, Object>> dbData = repository.executeAction(intent.action, intent.params);
+        String naturalReply = generateReply(intent.action, intent.params, dbData);
+        
+        return ResponseEntity.ok(new ChatResponse(naturalReply, dbData));
+
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body("Lỗi: " + e.getMessage());
+    }
+}
 
     private String generateReply(String action, Map<String, Object> params, List<Map<String, Object>> data) {
         if (data == null || data.isEmpty()) {
             return "Tôi đã tra cứu nhưng không tìm thấy dữ liệu phù hợp trong hệ thống.";
         }
+        
         ActionConfig config = actionConfigService.getConfig(action);
+        
+        // Xử lý riêng cho hành động xem chi tiết thẻ bài
         if ("ANALYZE_CARD_DETAIL".equals(action) && params.containsKey("card_name")) {
             return String.format(config.getReply(), params.get("card_name"));
         }
