@@ -1,8 +1,0 @@
-action,reply,is_static,static_data
-YOUTUBE_CHANNEL,"Bạn có thể tham khảo kênh Youtube Hổ ghi sổ bằng link sau: ",true,https://www.youtube.com/@bb449-m2y
-GET_TOP_CARDS,"Đây là danh sách các lá bài hàng đầu phù hợp với yêu cầu của bạn.",false,
-GET_USAGE_STATS,"Đây là biểu đồ phân bổ tỷ lệ Meta theo cấu trúc bạn yêu cầu.",false,
-GET_DECK_RANKINGS,"Dưới đây là bảng xếp hạng các bộ bài (Decks) có hiệu suất tốt nhất.",false,
-ANALYZE_CARD_DETAIL,"Phân tích xong! Lá bài %s có hiệu số winrate như sau:",false,
-GET_PLAYER_RANKINGS,"Đây là danh sách những người chơi xuất sắc nhất dựa trên dữ liệu giải đấu.",false,
-ERROR,"Xin lỗi, tôi không thể phân tích yêu cầu này. Hãy thử hỏi về 'top card' hoặc 'winrate' nhé.",true,

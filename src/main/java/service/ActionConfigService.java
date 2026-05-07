@@ -19,7 +19,8 @@ import dto.ActionConfig;
 public class ActionConfigService {
 
     private final Map<String, ActionConfig> configMap = new HashMap<>();
-    private final Path CSV_PATH = Paths.get("config", "action.csv");
+ // Sửa dòng khai báo PATH cũ
+    private final Path CSV_PATH = Paths.get(System.getProperty("user.dir"), "config", "action.csv");
 
     @PostConstruct
     public void init() {
