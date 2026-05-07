@@ -17,10 +17,10 @@ spring:
           use_jdbc_metadata_defaults: false
 
 # Đưa gemini ra ngoài datasource để tránh nhầm lẫn cấu hình DB
-gemini:
+cohere:
   api:
-    keys: ${GEMINI_API_KEYS:GEMINI_API_KEY_1,GEMINI_API_KEY_2,GEMINI_API_KEY_3}
-    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent
+    key: ${GEMINI_API_KEYS}
+    url: https://api.cohere.ai/v1/chat
 
 server:
   port: ${PORT:8080}

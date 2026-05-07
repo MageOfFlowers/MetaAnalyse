@@ -23,30 +23,35 @@ public class AnalysisRepository {
     public List<Map<String, Object>> executeAction(String action, Map<String, Object> params) {
         ActionConfig config = actionConfigService.getConfig(action);
         
-        // 1. Xử lý Action tĩnh (is_static) từ cấu hình CSV (Ví dụ: LEARN_KNOWLEDGE)
+        // 1. Xử lý Action tĩnh (is_static) từ cấu hình CSV
+        // Sửa đổi: Đóng gói static_data vào List<Map> để tránh trả về null hoặc rỗng sai cấu trúc
         if (config != null && config.isStatic()) {
             List<Map<String, Object>> result = new ArrayList<>();
-            if (config.getStaticData() != null && !config.getStaticData().isEmpty()) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("link", config.getStaticData());
+            Map<String, Object> map = new HashMap<>();
+            
+            // Lấy dữ liệu tĩnh từ cột static_data trong CSV
+            String staticContent = config.getStaticData();
+            
+            // Nếu có dữ liệu thì đóng gói vào key "link" hoặc "content" tùy bạn quy định
+            if (staticContent != null && !staticContent.isEmpty()) {
+                map.put("link", staticContent); 
+                map.put("value", staticContent); // Backup thêm key value để linh hoạt
                 result.add(map);
             }
-            return result;
+            return result; 
         }
 
         if (params == null) params = new HashMap<>();
         
-        // 2. Xử lý bộ lọc chung cho các truy vấn thống kê (Top Cards, Rankings...)
+        // 2. Xử lý bộ lọc chung cho các truy vấn động
         StringBuilder commonFilter = new StringBuilder(" WHERE 1=1 ");
         List<Object> queryParams = new ArrayList<>();
 
-        // Lọc theo vùng miền (N, S)
         if (params.get("region") != null && !"all".equalsIgnoreCase(params.get("region").toString())) {
             commonFilter.append(" AND comp.region = ? ");
             queryParams.add(params.get("region").toString());
         }
         
-        // Lọc theo ngày thi đấu (competition_date) - Dựa trên cấu hình db thực tế
         if (params.get("startDate") != null) {
             commonFilter.append(" AND comp.competition_date >= ?::date ");
             queryParams.add(params.get("startDate"));
@@ -80,10 +85,8 @@ public class AnalysisRepository {
             case "HOW_TO_COUNTER":
                 return howToCounter(params);
 
-            case "YOUTUBE_CHANNEL":
-                return getYoutubeLink();
-
             default:
+                // Trả về list rỗng thay vì null để đảm bảo an toàn cho JSON response
                 return new ArrayList<>();
         }
     }
@@ -98,23 +101,19 @@ public class AnalysisRepository {
         }
     }
 
-    // --- CÁC ACTION MỚI CHO BẢNG GUIDE ---
+    // --- CÁC HÀM TRUY VẤN DATABASE ---
 
-    // Hướng dẫn Build bộ bài
     private List<Map<String, Object>> howToBuild(Map<String, Object> params) {
         String cardName = (String) params.getOrDefault("card_name", "");
         String sql = "SELECT name, details FROM guide WHERE type = 'Build' AND name ILIKE ?";
         return db.queryForList(sql, "%" + cardName + "%");
     }
 
-    // Hướng dẫn khắc chế
     private List<Map<String, Object>> howToCounter(Map<String, Object> params) {
         String cardName = (String) params.getOrDefault("card_name", "");
         String sql = "SELECT name, details FROM guide WHERE type = 'Counter' AND name ILIKE ?";
         return db.queryForList(sql, "%" + cardName + "%");
     }
-
-    // --- CÁC ACTION THỐNG KÊ CŨ ---
 
     private List<Map<String, Object>> getTopCards(Map<String, Object> params, String commonFilter, List<Object> p) {
         String sortBy = "usage".equals(params.get("sort_by")) ? "COUNT(cu.id)" : "AVG(cu.winrate)";
@@ -171,7 +170,7 @@ public class AnalysisRepository {
     private List<Map<String, Object>> analyzeCardDetail(Map<String, Object> params) {
         String cardName = (String) params.getOrDefault("card_name", "");
         String sql = "SELECT di.quantity, AVG(cu.winrate) as winrate, COUNT(*) as sample_size, MAX(c.url) as url " +
-                     "FROM card c " +
+                     "FROM card c " + 
                      "JOIN deck_info di ON c.id = di.cardid " +
                      "JOIN competition_use cu ON di.deckid = cu.deckid " +
                      "WHERE c.name ILIKE ? " +
@@ -184,7 +183,6 @@ public class AnalysisRepository {
         String sortParam = (String) params.getOrDefault("sort_by", "winrate");
         String orderBy = "winrate".equals(sortParam) ? "AVG(cu.winrate) DESC" : "AVG(cu.rank) ASC";
 
-        // Sử dụng username theo yêu cầu hệ thống
         String sql = "SELECT u.username, AVG(cu.winrate) as winrate, AVG(cu.rank) as avg_rank, COUNT(*) as match_count " +
                      "FROM \"user\" u " + 
                      "JOIN competition_use cu ON u.id = cu.userid " +
@@ -194,13 +192,5 @@ public class AnalysisRepository {
                      " LIMIT " + getSafeLimit(params);
         
         return db.queryForList(sql, p.toArray());
-    }
-    
-    private List<Map<String, Object>> getYoutubeLink() {
-        List<Map<String, Object>> result = new ArrayList<>();
-        Map<String, Object> linkMap = new HashMap<>();
-        linkMap.put("link", "https://www.youtube.com/@bb449-m2y");
-        result.add(linkMap);
-        return result;
     }
 }

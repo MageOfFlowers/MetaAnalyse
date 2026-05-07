@@ -1,5 +1,5 @@
 action,reply,is_static,static_data,keywords
-YOUTUBE_CHANNEL,"Bạn có thể tham khảo kênh Youtube Hổ ghi sổ bằng link sau: ",true,https://www.youtube.com/@bb449-m2y,youtube|video
+YOUTUBE_CHANNEL,"Bạn có thể tham khảo kênh Youtube Hổ ghi sổ bằng link sau: ",true,"https://www.youtube.com/@bb449-m2y",youtube|video
 GET_TOP_CARDS,"Đây là danh sách các lá bài hàng đầu phù hợp với yêu cầu của bạn.",false,,
 GET_USAGE_STATS,"Đây là biểu đồ phân bổ tỷ lệ Meta theo cấu trúc bạn yêu cầu.",false,,
 GET_DECK_RANKINGS,"Dưới đây là bảng xếp hạng các bộ bài (Decks) có hiệu suất tốt nhất.",false,,
@@ -10,3 +10,4 @@ GIỚI_THIỆU_THẦN_TÍCH,"Thần Tích là trò chơi thẻ bài đấu trí 
 HOW_TO_BUILD,"Dưới đây là hướng dẫn xây dựng bộ bài phù hợp cho bạn:",false,null,
 HOW_TO_COUNTER,"Đây là các phương án và lá bài dùng để khắc chế đối thủ:",false,null,
 INTRO_BUILD,"Bạn có thể hỏi 'cách build + tên bài' để tôi tìm bài viết hướng dẫn nhé.",true,null,xây dựng bộ bài|hướng dẫn build
+GIỚI_THIỆU_THẦN_TÍCH,"Thần Tích là trò chơi thẻ bài đấu trí (Trading Card Game - TCG) đầu tiên của Việt Nam lấy cảm hứng từ kho tàng thần thoại, cổ tích và lịch sử dân tộc. Trong trò chơi, người chơi sẽ xây dựng bộ bài dựa trên các hệ màu và vùng miền khác nhau, sử dụng chiến thuật để triệu hồi các vị thần, anh hùng và thi triển pháp thuật nhằm đánh bại đối thủ.",true,"","Thần Tích|Trading Card Game|thần thoại Việt Nam|thẻ bài chiến thuật"
