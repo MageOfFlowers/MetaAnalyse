@@ -118,23 +118,11 @@ public class TeamfightService {
             throw badRequest("The tie-break winner must be one of the teams in this match.");
         }
 
-        List<TeamfightMember> roster = memberRepo.findByTeamIdIn(List.of(team1.getId(), team2.getId()));
-        Map<Long, TeamfightMember> memberByUser = new HashMap<>();
-        Map<Long, Set<Long>> decksByTeam = new HashMap<>();
-        for (TeamfightMember member : roster) {
-            if (memberByUser.putIfAbsent(member.getUserId(), member) != null) {
-                throw badRequest("A player cannot belong to both teams in a match.");
-            }
-            decksByTeam.computeIfAbsent(member.getTeamId(), ignored -> new HashSet<>()).add(member.getDeckId());
-        }
         for (TeamfightMatchRequest.Duel duel : request.duels) {
-            TeamfightMember p1 = memberByUser.get(duel.player1Id);
-            TeamfightMember p2 = memberByUser.get(duel.player2Id);
-            if (p1 == null || p2 == null
-                    || !team1.getId().equals(p1.getTeamId()) || !team2.getId().equals(p2.getTeamId())
-                    || !decksByTeam.get(team1.getId()).contains(duel.deck1Id)
-                    || !decksByTeam.get(team2.getId()).contains(duel.deck2Id)) {
-                throw badRequest("Each duel must use roster players and decks owned by the respective teams.");
+            if (duel.player1Id == null || duel.player2Id == null || duel.deck1Id == null || duel.deck2Id == null
+                    || !userRepo.existsById(duel.player1Id) || !userRepo.existsById(duel.player2Id)
+                    || !deckRepo.existsById(duel.deck1Id) || !deckRepo.existsById(duel.deck2Id)) {
+                throw badRequest("Each duel must select existing players and decks.");
             }
             if (duel.winnerSide == null || !Set.of("TEAM1", "TEAM2", "DRAW").contains(duel.winnerSide)) {
                 throw badRequest("Duel result must be TEAM1, TEAM2, or DRAW.");
