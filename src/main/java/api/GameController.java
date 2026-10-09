@@ -7,6 +7,10 @@ import repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.time.LocalDate;
+import java.util.Locale;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api")
@@ -34,6 +38,25 @@ public class GameController {
     @GetMapping("/competitions")
     public List<Competition> getCompetitions() { 
         return compRepo.findAll(); 
+    }
+
+    @PostMapping("/competitions")
+    public Competition createCompetition(@RequestBody Competition competition) {
+        if (competition.getName() == null || competition.getName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament name is required.");
+        }
+        String type = competition.getTournamentType() == null
+                ? "SINGLE" : competition.getTournamentType().toUpperCase(Locale.ROOT);
+        String format = competition.getTournamentFormat() == null
+                ? "SINGLE_ELIMINATION" : competition.getTournamentFormat().toUpperCase(Locale.ROOT);
+        if (!List.of("SINGLE", "TEAMFIGHT").contains(type)
+                || !List.of("SINGLE_ELIMINATION", "ROUND_ROBIN").contains(format)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported tournament type or format.");
+        }
+        competition.setTournamentType(type);
+        competition.setTournamentFormat(format);
+        if (competition.getDate() == null) competition.setDate(LocalDate.now());
+        return compRepo.save(competition);
     }
 
     @GetMapping("/competition-use")

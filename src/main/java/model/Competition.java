@@ -1,6 +1,7 @@
 package model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 
 @Entity
@@ -18,6 +19,12 @@ public class Competition {
 
     private String region;
 
+    @Column(name = "tournament_type", nullable = false)
+    private String tournamentType = "SINGLE";
+
+    @Column(name = "tournament_format", nullable = false)
+    private String tournamentFormat = "SINGLE_ELIMINATION";
+
     // Getters và Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -26,8 +33,14 @@ public class Competition {
     public void setName(String name) { this.name = name; }
 
     public LocalDate getDate() { return date; }
+    @JsonProperty("competition_date")
+    public LocalDate getCompetitionDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
 
     public String getRegion() { return region; }
     public void setRegion(String region) { this.region = region; }
+    public String getTournamentType() { return tournamentType; }
+    public void setTournamentType(String tournamentType) { this.tournamentType = tournamentType; }
+    public String getTournamentFormat() { return tournamentFormat; }
+    public void setTournamentFormat(String tournamentFormat) { this.tournamentFormat = tournamentFormat; }
 }
