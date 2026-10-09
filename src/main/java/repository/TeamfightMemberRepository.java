@@ -6,4 +6,5 @@ import model.TeamfightMember;
 
 public interface TeamfightMemberRepository extends JpaRepository<TeamfightMember, Long> {
     List<TeamfightMember> findByTeamIdIn(List<Long> teamIds);
+    void deleteByTeamId(Long teamId);
 }

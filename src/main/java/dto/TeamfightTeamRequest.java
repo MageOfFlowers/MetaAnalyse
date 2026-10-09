@@ -3,6 +3,7 @@ package dto;
 import java.util.List;
 
 public class TeamfightTeamRequest {
+    public Long id;
     public Long competitionId;
     public String name;
     public List<Member> members;

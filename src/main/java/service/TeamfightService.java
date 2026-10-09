@@ -43,7 +43,15 @@ public class TeamfightService {
         if (!"TEAMFIGHT".equalsIgnoreCase(competition.getTournamentType())) {
             throw badRequest("Teams can only be added to teamfight tournaments.");
         }
-        if (teamRepo.existsByCompetitionIdAndNameIgnoreCase(request.competitionId, request.name.trim())) {
+        TeamfightTeam team = request.id == null ? null
+                : teamRepo.findById(request.id).orElseThrow(() -> badRequest("Team not found."));
+        if (team != null && !team.getCompetitionId().equals(request.competitionId)) {
+            throw badRequest("Team belongs to another tournament.");
+        }
+        boolean duplicateName = request.id == null
+                ? teamRepo.existsByCompetitionIdAndNameIgnoreCase(request.competitionId, request.name.trim())
+                : teamRepo.existsByCompetitionIdAndNameIgnoreCaseAndIdNot(request.competitionId, request.name.trim(), request.id);
+        if (duplicateName) {
             throw badRequest("A team with this name already exists in the tournament.");
         }
         if (request.members == null || request.members.size() < 3 || request.members.size() > 4) {
@@ -55,6 +63,11 @@ public class TeamfightService {
                 .map(TeamfightTeam::getId).collect(Collectors.toList());
         List<TeamfightMember> existingMembers = existingTeamIds.isEmpty()
                 ? List.of() : memberRepo.findByTeamIdIn(existingTeamIds);
+        if (request.id != null) {
+            existingMembers = existingMembers.stream()
+                    .filter(existing -> !existing.getTeamId().equals(request.id))
+                    .collect(Collectors.toList());
+        }
         for (TeamfightTeamRequest.Member member : request.members) {
             if (member.userId == null || member.deckId == null || !users.add(member.userId) || !decks.add(member.deckId)) {
                 throw badRequest("Each member must have one distinct player and deck.");
@@ -68,8 +81,12 @@ public class TeamfightService {
             }
         }
 
-        TeamfightTeam team = new TeamfightTeam();
-        team.setCompetitionId(request.competitionId);
+        if (team == null) {
+            team = new TeamfightTeam();
+            team.setCompetitionId(request.competitionId);
+        } else {
+            memberRepo.deleteByTeamId(team.getId());
+        }
         team.setName(request.name.trim());
         team = teamRepo.save(team);
         for (TeamfightTeamRequest.Member member : request.members) {
@@ -110,15 +127,14 @@ public class TeamfightService {
             }
             decksByTeam.computeIfAbsent(member.getTeamId(), ignored -> new HashSet<>()).add(member.getDeckId());
         }
-        Set<Long> playersUsed = new HashSet<>();
         for (TeamfightMatchRequest.Duel duel : request.duels) {
             TeamfightMember p1 = memberByUser.get(duel.player1Id);
             TeamfightMember p2 = memberByUser.get(duel.player2Id);
-            if (p1 == null || p2 == null || !playersUsed.add(duel.player1Id) || !playersUsed.add(duel.player2Id)
+            if (p1 == null || p2 == null
                     || !team1.getId().equals(p1.getTeamId()) || !team2.getId().equals(p2.getTeamId())
                     || !decksByTeam.get(team1.getId()).contains(duel.deck1Id)
                     || !decksByTeam.get(team2.getId()).contains(duel.deck2Id)) {
-                throw badRequest("Each duel must use distinct roster players and a deck owned by that player's team.");
+                throw badRequest("Each duel must use roster players and decks owned by the respective teams.");
             }
             if (duel.winnerSide == null || !Set.of("TEAM1", "TEAM2", "DRAW").contains(duel.winnerSide)) {
                 throw badRequest("Duel result must be TEAM1, TEAM2, or DRAW.");

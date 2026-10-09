@@ -7,4 +7,5 @@ import model.TeamfightTeam;
 public interface TeamfightTeamRepository extends JpaRepository<TeamfightTeam, Long> {
     List<TeamfightTeam> findByCompetitionId(Long competitionId);
     boolean existsByCompetitionIdAndNameIgnoreCase(Long competitionId, String name);
+    boolean existsByCompetitionIdAndNameIgnoreCaseAndIdNot(Long competitionId, String name, Long id);
 }
