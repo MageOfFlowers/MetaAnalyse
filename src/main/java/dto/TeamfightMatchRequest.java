@@ -9,6 +9,7 @@ public class TeamfightMatchRequest {
     public Long team1Id;
     public Long team2Id;
     public Long tieBreakWinnerTeamId;
+    public Boolean thirdPlace;
     public List<Duel> duels;
 
     public static class Duel {

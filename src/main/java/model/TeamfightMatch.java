@@ -24,6 +24,9 @@ public class TeamfightMatch {
     @Column(name = "winner_team_id")
     private Long winnerTeamId;
 
+    @Column(name = "is_third_place", nullable = false)
+    private boolean thirdPlace;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getCompetitionId() { return competitionId; }
@@ -36,4 +39,6 @@ public class TeamfightMatch {
     public void setTeam2Id(Long team2Id) { this.team2Id = team2Id; }
     public Long getWinnerTeamId() { return winnerTeamId; }
     public void setWinnerTeamId(Long winnerTeamId) { this.winnerTeamId = winnerTeamId; }
+    public boolean isThirdPlace() { return thirdPlace; }
+    public void setThirdPlace(boolean thirdPlace) { this.thirdPlace = thirdPlace; }
 }

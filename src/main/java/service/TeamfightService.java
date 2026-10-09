@@ -123,6 +123,7 @@ public class TeamfightService {
         match.setRoundNumber(request.roundNumber);
         match.setTeam1Id(team1.getId());
         match.setTeam2Id(team2.getId());
+        match.setThirdPlace(Boolean.TRUE.equals(request.thirdPlace));
 
         int team1Wins = (int) request.duels.stream().filter(d -> "TEAM1".equals(d.winnerSide)).count();
         int team2Wins = (int) request.duels.stream().filter(d -> "TEAM2".equals(d.winnerSide)).count();
